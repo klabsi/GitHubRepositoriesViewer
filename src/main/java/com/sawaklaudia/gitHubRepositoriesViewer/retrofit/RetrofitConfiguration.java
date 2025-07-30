@@ -11,7 +11,7 @@ public class RetrofitConfiguration {
     @Bean
     public GitHubApi githubApi(){
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://developer.github.com/v3")
+                .baseUrl("https://api.github.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
