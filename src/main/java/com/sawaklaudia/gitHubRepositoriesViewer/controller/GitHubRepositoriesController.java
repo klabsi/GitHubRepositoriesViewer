@@ -1,6 +1,6 @@
 package com.sawaklaudia.gitHubRepositoriesViewer.controller;
 
-import com.sawaklaudia.gitHubRepositoriesViewer.model.Repo;
+import com.sawaklaudia.gitHubRepositoriesViewer.response.RepoResponse;
 import com.sawaklaudia.gitHubRepositoriesViewer.service.GitHubRepositoriesService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ public class GitHubRepositoriesController {
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<List<Repo>> getRepositories(@PathVariable("username") String username) {
+    public ResponseEntity<List<RepoResponse>> getRepositories(@PathVariable("username") String username) {
         var repositoriesList = gitHubRepositoriesService.getRepositories(username);
         return new ResponseEntity<>(repositoriesList,
                 HttpStatus.OK
