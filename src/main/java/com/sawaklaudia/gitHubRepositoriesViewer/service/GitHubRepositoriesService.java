@@ -1,6 +1,8 @@
 package com.sawaklaudia.gitHubRepositoriesViewer.service;
 
 import com.sawaklaudia.gitHubRepositoriesViewer.model.Branch;
+import com.sawaklaudia.gitHubRepositoriesViewer.model.Owner;
+import com.sawaklaudia.gitHubRepositoriesViewer.model.Repo;
 import com.sawaklaudia.gitHubRepositoriesViewer.retrofit.GitHubApi;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +19,20 @@ public class GitHubRepositoriesService {
         this.gitHubApi = gitHubApi;
     }
 
-    public String getRepositories(String username) {
+    public List<Repo> getRepositories(String username) {
         try {
             List<Repo> repos = gitHubApi.listRepos(username).execute().body();
 
             return repos.stream()
-                    .map(repo -> repo.name())
-                    .collect(Collectors.joining(", "));
+                    .filter(repo -> !repo.isForked())
+                    .map(repo -> {
+                        String repoName = repo.name();
+                        String login = repo.owner().login();
+                        List<Branch> branches = getBranchesInfo(login, repoName);
+
+                        return new Repo(repoName, new Owner(login), branches, false);
+                    })
+                    .collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException("Error downloading user repositories.");
         }
