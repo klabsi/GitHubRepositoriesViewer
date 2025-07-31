@@ -1,7 +1,7 @@
 package com.sawaklaudia.gitHubRepositoriesViewer.service;
 
+import com.sawaklaudia.gitHubRepositoriesViewer.model.Branch;
 import com.sawaklaudia.gitHubRepositoriesViewer.retrofit.GitHubApi;
-import com.sawaklaudia.gitHubRepositoriesViewer.model.Repo;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -26,6 +26,18 @@ public class GitHubRepositoriesService {
                     .collect(Collectors.joining(", "));
         } catch (IOException e) {
             throw new RuntimeException("Error downloading user repositories.");
+        }
+    }
+
+    public List<Branch> getBranchesInfo(String username, String repoName) {
+        try {
+            List<Branch> branches = gitHubApi.listBranches(username, repoName).execute().body();
+
+            return branches.stream()
+                    .map(branch -> new Branch(branch.name(), branch.commit()))
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException("Error downloading branches.");
         }
     }
 }
