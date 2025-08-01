@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import retrofit2.Response;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,41 +40,50 @@ public class GitHubRepositoriesService {
     @NotNull
     private List<RepoResponse> getRepos(Response<List<Repo>> response) {
         List<Repo> allRepos = response.body();
-        List<Repo> nonForkedRepos = filterOutForks(allRepos);
 
-        List<RepoResponse> finalRepos = new ArrayList<>();
-        for (Repo repo : nonForkedRepos) {
-            String repoName = repo.name();
-            String login = repo.owner().login();
-            List<Branch> branches = getBranchesInfo(login, repoName);
-
-            RepoResponse finalRepo = RepoResponse.builder()
-                    .name(repoName)
-                    .login(login)
-                    .branches(branches)
-                    .build();
-
-            finalRepos.add(finalRepo);
+        if(allRepos == null) {
+            return Collections.emptyList();
         }
 
-        return finalRepos;
+        return mapNotForkedReposToResponses(allRepos);
     }
 
-    private List<Repo> filterOutForks(List<Repo> repos) {
-        return repos.stream()
+    @NotNull
+    private List<RepoResponse> mapNotForkedReposToResponses(List<Repo> allRepos) {
+        return allRepos.stream()
                 .filter(repo -> !repo.isForked())
+                .map(repo -> {
+                    String repoName = repo.name();
+                    String login = repo.owner().login();
+                    List<Branch> branches = getBranchesInfo(login, repoName);
+
+                    return RepoResponse.builder()
+                            .name(repoName)
+                            .login(login)
+                            .branches(branches)
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 
     private List<Branch> getBranchesInfo(String username, String repoName) {
+        List<Branch> branches;
         try {
-            List<Branch> branches = gitHubApi.listBranches(username, repoName).execute().body();
-
-            return branches.stream()
-                    .map(branch -> new Branch(branch.name(), branch.commit()))
-                    .collect(Collectors.toList());
+            branches = gitHubApi.listBranches(username, repoName).execute().body();
         } catch (IOException e) {
             throw new RuntimeException("Error downloading branches.");
         }
+
+        if(branches == null) {
+            return Collections.emptyList();
+        }
+
+        return branches.stream()
+                .map(branch -> Branch.builder()
+                        .name(branch.name())
+                        .commit(branch.commit())
+                        .build()
+                )
+                .collect(Collectors.toList());
     }
 }

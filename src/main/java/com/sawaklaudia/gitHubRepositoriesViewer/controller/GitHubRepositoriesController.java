@@ -22,10 +22,10 @@ public class GitHubRepositoriesController {
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity<List<RepoResponse>> getRepositories(@PathVariable("username") String username) {
+    public ResponseEntity<List<RepoResponse>> getRepositories
+            (@PathVariable("username") String username) {
         var repositoriesList = gitHubRepositoriesService.getRepositories(username);
-        return new ResponseEntity<>(repositoriesList,
-                HttpStatus.OK
+        return new ResponseEntity<>(repositoriesList, HttpStatus.OK
         );
     }
 }
