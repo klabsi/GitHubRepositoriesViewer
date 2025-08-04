@@ -1,6 +1,8 @@
 package com.sawaklaudia.gitHubRepositoriesViewer.service;
 
+import com.sawaklaudia.gitHubRepositoriesViewer.exception.GitHubBranchesDownloadException;
 import com.sawaklaudia.gitHubRepositoriesViewer.exception.GitHubUserNotFoundException;
+import com.sawaklaudia.gitHubRepositoriesViewer.exception.NetworkRequestException;
 import com.sawaklaudia.gitHubRepositoriesViewer.model.Branch;
 import com.sawaklaudia.gitHubRepositoriesViewer.model.Repo;
 import com.sawaklaudia.gitHubRepositoriesViewer.response.RepoResponse;
@@ -29,9 +31,11 @@ public class GitHubRepositoriesService {
             response = gitHubApi.listRepos(username).execute();
             if (response.code() == 404) {
                 throw new GitHubUserNotFoundException("Provided GitHub user doesn't exist.");
+                throw new GitHubUserNotFoundException("Provided GitHub user doesn't exist: " + username);
             }
         } catch (IOException e) {
             throw new RuntimeException("Error downloading repositories for " + username + ": " + e.getMessage());
+            throw new NetworkRequestException("Error downloading repositories for "
         }
 
         return getRepos(response);
@@ -72,6 +76,7 @@ public class GitHubRepositoriesService {
             branches = gitHubApi.listBranches(username, repoName).execute().body();
         } catch (IOException e) {
             throw new RuntimeException("Error downloading branches.");
+            throw new GitHubBranchesDownloadException("Error downloading branches:" + e.getMessage());
         }
 
         if(branches == null) {
