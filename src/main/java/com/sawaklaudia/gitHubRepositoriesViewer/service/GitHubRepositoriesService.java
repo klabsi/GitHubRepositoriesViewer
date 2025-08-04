@@ -7,6 +7,7 @@ import com.sawaklaudia.gitHubRepositoriesViewer.model.Branch;
 import com.sawaklaudia.gitHubRepositoriesViewer.model.Repo;
 import com.sawaklaudia.gitHubRepositoriesViewer.response.RepoResponse;
 import com.sawaklaudia.gitHubRepositoriesViewer.retrofit.GitHubApi;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import retrofit2.Response;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class GitHubRepositoriesService {
 
     private final GitHubApi gitHubApi;
@@ -26,16 +28,18 @@ public class GitHubRepositoriesService {
     }
 
     public List<RepoResponse> getRepositories(String username) {
+        log.info("downloading repositories for '{}'", username);
         Response<List<Repo>> response;
         try {
             response = gitHubApi.listRepos(username).execute();
             if (response.code() == 404) {
-                throw new GitHubUserNotFoundException("Provided GitHub user doesn't exist.");
+                log.warn("provided GitHub user doesn't exist: {}", username);
                 throw new GitHubUserNotFoundException("Provided GitHub user doesn't exist: " + username);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Error downloading repositories for " + username + ": " + e.getMessage());
+            log.error("error downloading {}'s repositories: ", username, e);
             throw new NetworkRequestException("Error downloading repositories for "
+                    + username + ": " + e.getMessage());
         }
 
         return getRepos(response);
@@ -71,11 +75,12 @@ public class GitHubRepositoriesService {
     }
 
     private List<Branch> getBranchesInfo(String username, String repoName) {
+        log.info("downloading branches for '{}' from repository '{}'", username, repoName);
         List<Branch> branches;
         try {
             branches = gitHubApi.listBranches(username, repoName).execute().body();
         } catch (IOException e) {
-            throw new RuntimeException("Error downloading branches.");
+            log.error("error downloading branches for user '{}' from repository '{}'", username, repoName, e);
             throw new GitHubBranchesDownloadException("Error downloading branches:" + e.getMessage());
         }
 
