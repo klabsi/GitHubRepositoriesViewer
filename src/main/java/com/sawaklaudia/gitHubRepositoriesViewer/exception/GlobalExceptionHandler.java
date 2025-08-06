@@ -15,7 +15,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBadGitHubUserInRequest(GitHubUserNotFoundException exception) {
         log.warn("not existing github user was provided");
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(404)
+                .status(HttpStatus.NOT_FOUND.value())
                 .message("Provided GitHub user doesn't exist.")
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);

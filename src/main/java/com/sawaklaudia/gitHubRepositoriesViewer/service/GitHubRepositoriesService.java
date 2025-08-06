@@ -32,23 +32,22 @@ public class GitHubRepositoriesService {
         Response<List<Repo>> response;
         try {
             response = gitHubApi.listRepos(username).execute();
-            if (response.code() == 404) {
-                log.warn("provided GitHub user doesn't exist: {}", username);
-                throw new GitHubUserNotFoundException("Provided GitHub user doesn't exist: " + username);
-            }
         } catch (IOException e) {
             log.error("error downloading {}'s repositories: ", username, e);
             throw new NetworkRequestException("Error downloading repositories for "
                     + username + ": " + e.getMessage());
         }
 
-        return getRepos(response);
+        if (response.code() == 404) {
+            log.warn("provided GitHub user doesn't exist: {}", username);
+            throw new GitHubUserNotFoundException("Provided GitHub user doesn't exist: " + username);
+        }
+
+        return getRepos(response.body());
     }
 
     @NotNull
-    private List<RepoResponse> getRepos(Response<List<Repo>> response) {
-        List<Repo> allRepos = response.body();
-
+    private List<RepoResponse> getRepos(List<Repo> allRepos) {
         if(allRepos == null) {
             return Collections.emptyList();
         }
@@ -80,7 +79,8 @@ public class GitHubRepositoriesService {
         try {
             branches = gitHubApi.listBranches(username, repoName).execute().body();
         } catch (IOException e) {
-            log.error("error downloading branches for user '{}' from repository '{}'", username, repoName, e);
+            log.error("error downloading branches for user '{}' from repository '{}', error: {}",
+                    username, repoName, e.getMessage());
             throw new GitHubBranchesDownloadException("Error downloading branches:" + e.getMessage());
         }
 

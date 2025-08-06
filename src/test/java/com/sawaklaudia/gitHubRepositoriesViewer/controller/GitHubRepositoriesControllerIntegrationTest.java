@@ -26,10 +26,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 })
 class GitHubRepositoriesControllerIntegrationTest {
 
-
     @Autowired
     private TestRestTemplate restTemplate;
-
 
     @Test
     void shouldGetAllNonForkedRepositories() {
@@ -71,8 +69,7 @@ class GitHubRepositoriesControllerIntegrationTest {
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<>() {
-                }
-        );
+                });
 
         // then
         assertEquals(HttpStatus.OK, response.getStatusCode());
