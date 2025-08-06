@@ -1,6 +1,6 @@
 # GitHubRepositoriesViewer
-This Spring Boot Application allows to get information about public non-forked GitHub repositories and their branches.
-___
+This Spring Boot Application allows users to get information about public non-forked GitHub repositories and their branches.
+
 ## Technologies:
 - Java21+
 - Spring Boot 3.x
