@@ -27,11 +27,25 @@ cd GitHubRepositoriesViewer
 ./gradlew bootRun
 ```
 
-#### 3. Access the GET endpoint
- 
-Available endpoint:
+#### 3. (Optional) Build the JAR file
+If you just want to build the application:
+```bash
+./gradlew bootJar
+```
+The .jar file will be created in the build/libs/ folder. To run it, use the command:
+```bash
+java -jar build/libs/gitHubRepositoriesViewer-0.0.1-SNAPSHOT.jar
+```
+
+#### 3. Test the GET endpoint
+The available endpoint allows listing non-forked repositories and branches with the last commit SHA for a GitHub user.
+After launching the application, the endpoint will be available at:
 ```html
-http://localhost:8080/repos/{username}  -> list non-forked repos, branches with last sha for GitHub user
+http://localhost:8080/gitHubRepositories/{username}
+```
+From the terminal
+```bash
+curl --location 'http://localhost:8080/gitHubRepositories/{username}'
 ```
 #### Example response:
 ```json
