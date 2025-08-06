@@ -1,7 +1,6 @@
 # GitHubRepositoriesViewer
-___
 This Spring Boot Application allows to get information about public non-forked GitHub repositories and their branches.
-
+___
 ## Technologies:
 - Java21+
 - Spring Boot 3.x
@@ -43,7 +42,7 @@ After launching the application, the endpoint will be available at:
 ```html
 http://localhost:8080/gitHubRepositories/{username}
 ```
-From the terminal
+From the terminal:
 ```bash
 curl --location 'http://localhost:8080/gitHubRepositories/{username}'
 ```
@@ -51,14 +50,14 @@ curl --location 'http://localhost:8080/gitHubRepositories/{username}'
 ```json
 [
    {
-      "name":"repo-name",
-      "owner":{
-         "login":"owner-login"
+      "name": "repo-name",
+      "owner": {
+         "login": "owner-login"
       },
-      "branches":[
+      "branches": [
          {
-            "name":"main",
-            "sha":"last-commit-sha"
+            "name": "main",
+            "sha": "last-commit-sha"
          }
       ]
    }
